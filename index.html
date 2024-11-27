@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 시</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family:  'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #ffcc00;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            margin-top: 20vh;
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .receipt {
+            display: none;
+            background-color: white;
+            width: 300px;
+            padding: 20px;
+            text-align: center;
+            background-image: url(paper.png);
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .poem {
+            margin: 20px 0;
+            text-align: center;
+            line-height: 1.6;
+            font-family: 'Myeongjo', '명조체', serif;
+        }
+
+        .poet {
+            border-top: 1px dashed #000;
+            padding-top: 10px;
+            margin-top: 10px;
+            text-align: right;
+            font-style: italic;
+            
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            padding: 10px;
+            line-height: 1.4;
+            border-top: 1px dashed #000;
+        }
+
+        .button-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; /* 동그라미로 만들기 */
+            background-color: black;
+            color: white;
+            border: 2px solid #000;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            text-align: center;
+            line-height: 1.2;
+            width: 80px;  /* 버튼 크기 조정 */
+            height: 80px;  /* 버튼 크기 조정 */
+            font-size: 12px; 
+        }
+
+        button:hover {
+            background-color: #333;
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-text"><strong style='font-size: 30px;'>오늘의 시</strong>를 발급해보세요</div>
+        <button onclick="showPoem()">시<br>생성하기</button>
+    </div>
+
+    <div class="receipt" id="receiptScreen">
+        <div class="header">
+            <h2>오늘의 시 <br> 
+                <img src="barcode.png" style="width: 150px; height: auto; margin-top: 0; margin-bottom: 0;">
+            </h2>
+        
+            <div id="date"></div>
+            <div id="time"></div>
+        </div>
+        <div class="poem" id="poem"></div>
+        <div class="poet" id="poet"></div>
+        <div class="footer" id="poetInfo"></div>
+        <div class="button-container">
+            <button onclick="generatePoem()">오늘의 시</button>
+        </div>
+    </div>
+
+    <script>
+        const poems = [
+            {
+                title: "서시",
+        content: "죽는 날까지 하늘을 우러러\n한 점 부끄럽지 않기를,\n잎새에 이는 바람에도\n나는 괴로워했다.\n별을 노래하는 마음으로\n모든 죽어가는 것을 사랑해야지\n그리고 나한테 주어진\n길을 걸어가야겠다.",
+        poet: "윤동주",
+        info: "일제강점기의 저항시인으로, 순수한 서정과 맑은 정신을 노래한 영원한 청년 시인"
+    },
+    {
+        title: "꽃",
+        content: "내가 그의 이름을 불러주기 전에는\n그는 다만\n하나의 몸짓에 지나지 않았다.\n\n내가 그의 이름을 불러주었을 때,\n그는 나에게로 와서\n꽃이 되었다.",
+        poet: "김춘수",
+        info: "존재의 의미와 언어의 본질을 탐구한 현대시의 개척자"
+    },
+    {
+        title: "풀",
+        content: "자세히 보아야\n예쁘다\n\n오래 보아야\n사랑스럽다\n\n너도 그렇다",
+        poet: "나태주",
+        info: "'풀꽃 시인'으로 알려진 서정시인. 일상의 작은 것들에서 아름다움을 발견하는 시선이 특징"
+    },
+    {
+        title: "사랑의 물리학",
+        content: "사랑은\n원심력과 구심력의\n오묘한 조화여서\n\n멀어지는 듯\n가까워지고\n\n가까워지는 듯\n멀어진다",
+        poet: "김용택",
+        info: "'섬진강 시인'으로 불리며, 자연과 일상의 서정을 맑은 시선으로 담아내는 현대시인"
+    },
+    {
+        title: "세상에서 가장 아름다운 이별",
+        content: "눈은 눈대로\n봄은 봄대로\n\n꽃은 꽃대로\n바람은 바람대로\n\n모두 제각각\n자신의 길을 가듯이\n\n우리도 우리대로\n걸어가는 거야",
+        poet: "노천명",
+        info: "한국 현대시의 첫 여성시인으로, 섬세한 감성과 지적인 언어로 사랑과 이별을 노래"
+    },
+    {
+        title: "진달래꽃",
+        content: "나 보기가 역겨워\n가실 때에는\n말없이 고이 보내드리오리다\n\n영변에 약산\n진달래꽃\n아름 따다 가실 길에 뿌리오리다\n\n가시는 걸음걸음\n놓인 그 꽃을\n사뿐히 즈려밟고 가시옵소서\n\n나 보기가 역겨워\n가실 때에는\n죽어도 아니 눈물 흘리오리다",
+        poet: "김소월",
+        info: "한국 현대시의 대표적 서정시인으로, 민요조의 리듬과 한의 정서를 아름답게 표현"
+    },
+    {
+        title: "방문객",
+        content: "그대 방문객\n\n나의 문 앞에 서서\n종을 누르지 말아 주오\n\n지금 나는\n나의 생을 정리하느라\n벽에 걸린 액자들과\n먼지 쌓인 사진들과\n책상 위에 놓인 펜들과\n이야기를 나누고 있소",
+        poet: "정현종",
+        info: "일상의 사물과 순간들을 철학적 사유로 승화시키는 지성적 서정시인"
+    },
+    {
+        title: "빗방울",
+        content: "빗방울이 떨어진다\n마른 땅에 떨어진다\n\n잠시 머물다가\n흙 속으로 스며드는\n빗방울처럼\n\n우리도 잠시\n이 세상에 머물다가\n어디론가 사라지는\n빗방울이다",
+        poet: "권영민",
+        info: "현대 한국시의 서정성을 계승하며, 자연과 인생을 섬세하게 노래하는 시인"
+    },
+    {
+        title: "벌레들",
+        content: "몸에서 기름이 흐르는 사람은\n몸에서 기름이 흐르는 사람끼리 붙어 다닌다\n그들은 서로의 기름 냄새를 맡으며 교미하고\n서로의 체액을 마시며 새끼를 낳는다\n몸이 마른 사람은\n몸이 마른 사람끼리 붙어 다닌다",
+        poet: "김기택",
+        info: "일상 속에서 발견되는 디테일을 날카롭게 포착하며 독창적인 감각을 선보이는 시인. 특히 생명과 사물에 대한 미세한 관찰이 돋보인다."
+    },
+    {
+        title: "날마다 하나씩 버리기",
+        content: "날마다 하나씩 버리기로 했다.\n맨 처음엔 내 눈을 버렸다.\n어차피 보아도 아무것도 보이지 않으니.\n다음엔 내 입을 버렸다.\n어차피 말해도 아무도 듣지 않으니",
+        poet: "김민정",
+        info: "젊은 세대의 감성과 독특한 목소리를 담아낸 시인. 거침없고 신선한 표현이 특징."
+    },
+    {
+        title: "달력에 없는 날들",
+        content: "어떤 날은 달력에 없어\n그런 날엔 아침에도, 낮에도, 저녁에도\n하루가 잘 익지 않아\n아무리 가만히 앉아 있어도",
+        poet: "황인숙",
+        info: "간결하고 담백한 언어로 삶의 세세한 순간을 포착하며 인간의 본질적인 감정을 탐구하는 시인."
+    },
+    {
+        title: "혼자가 혼자에게",
+        content: "누구도 아닌 내가\n나에게 안부를 묻는다\n너는 잘 있니\n어디쯤 서 있는 거니\n어쩌면, 어쩌면 너도 혼자인 거니",
+        poet: "이병률",
+        info: "여행과 만남을 중심으로 감각적인 언어로 삶의 의미를 탐구하는 시인"
+    },
+    {
+        title: "운다고 달라지는 일은 아무것도 없겠지만",
+        content: "울고 나면 좀 나아질 거야\n울어도 아무것도 달라지지 않을 거야\n다들 그렇게 말했지만\n울어본 사람은 알지\n울고 나면 조금은 나아진다는 것을",
+        poet: "박준",
+        info: "섬세한 감성과 따뜻한 위로를 전하는 시인"
+    },
+    {
+        title: "비누풍선",
+        content: "무지개를 풀어서\n오색구름 풀어서\n동그란 풍선을 만들어서요\n달나라로 가라고\n꿈나라로 가라고\n고히고히 불어서 날리웁니다.",
+        poet: "이원수",
+        info: "일상적이고 서정적인 소재를 통해 인간의 내면적인 감정과 갈등을 섬세하게 표현한 시인."
+    },
+    {
+        title: "나그네",
+        content: "강나루 건너서\n밀밭 길을\n구름에 달 가듯이\n가는 나그네.\n\n길은 외줄기\n남도 삼백 리.\n\n술 익은 마을마다\n타는 저녁놀.\n\n구름에 달 가듯이\n가는 나그네.",
+        poet: "박목월",
+        info: "자연과 인간을 밀접하게 연결하며 서정적이고 감동적인 작품을 창조한 시인."
+    },
+    {
+        title: "첫사랑",
+        content: "그대가 꺾어준 꽃\n\n시들 때 까지 들여다 보았네\n\n그대가 남기고 간 시든 꽃\n\n다시 필 때까지",
+        poet: "이윤학",
+        info: "한국 전통의 미와 현대적 감각을 결합하여 인간 존재와 자연에 대한 깊은 성찰을 담은 시인."
+    },
+    {
+        title: "하늘",
+        content: "하늘은 바다\n\n끝없이 넓고 푸른 바다\n\n구름은 조각배\n\n바람이 사공 되어\n\n노를 젓는다.",
+        poet: "최계락",
+        info: "사실적이고 현실적인 시각으로 사회적 문제와 인간의 고독을 진지하게 다룬 시인."
+    },
+    {
+        title: "끝없는 강물이 흐르네",
+        content: "내 마음의 어딘 듯 한편에 끝없는\n강물이 흐르네.\n\n돋쳐 오르는 아침 날 빛이 빤질한\n은결을 도도네.\n\n가슴엔 듯 눈엔 듯 또 핏줄엔 듯\n마음이 도른도른 숨어 있는 곳\n\n내 마음의 어딘 듯 한 편에 끝없는\n강물이 흐르네.",
+        poet: "김영량",
+        info: "서정적이고 철학적인 깊이를 지닌 시로 인간 존재와 삶의 본질을 탐구한 시인."
+    }
+];
+
+        function getCurrentDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('ko-KR');
+            const time = now.toLocaleTimeString('ko-KR');
+            return { date, time };
+        }
+
+        function showPoem() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('receiptScreen').style.display = 'block';
+            generatePoem();
+        }
+
+        function generatePoem() {
+            const poemContainer = document.getElementById('poem');
+            const poetContainer = document.getElementById('poet');
+            const poetInfoContainer = document.getElementById('poetInfo');
+            const dateElement = document.getElementById('date');
+            const timeElement = document.getElementById('time');
+
+            const { date, time } = getCurrentDateTime();
+            dateElement.textContent = date;
+            timeElement.textContent = time;
+
+            const randomPoem = poems[Math.floor(Math.random() * poems.length)];
+            poemContainer.innerHTML = `
+                <strong>${randomPoem.title}</strong><br><br>
+                ${randomPoem.content.replace(/\n/g, '<br>')}
+            `;
+            poetContainer.innerHTML = `- ${randomPoem.poet}`;
+            poetInfoContainer.innerHTML = randomPoem.info;
+        }
+    </script>
+</body>
+</html>
